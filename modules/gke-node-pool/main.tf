@@ -1,13 +1,13 @@
 # GKE cluster
 data "google_container_engine_versions" "gke_version" {
-  location       = var.region
+  location       = var.zone
   version_prefix = var.version_prefix
 }
 
 # Separately Managed Node Pool Template
 resource "google_container_node_pool" "node_pool_template" {
   name     = var.cluster_name
-  location = var.region
+  location = var.zone
   cluster  = var.cluster_name
   node_count = var.node_count
   version      = data.google_container_engine_versions.gke_version.release_channel_latest_version["STABLE"]

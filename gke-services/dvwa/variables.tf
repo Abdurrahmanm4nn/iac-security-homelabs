@@ -1,25 +1,9 @@
 variable "project" {
-  default = "rmn-learn-iac"
-}
-
-variable "region" {
-  default = "us-central1"
-}
-
-variable "zone" {
-  default = "us-central1-b"
-}
-
-variable "gke_username" {
-  default     = ""
-  description = "gke username"
-}
-
-variable "gke_password" {
-  default     = ""
-  description = "gke password"
+  description = "Project ID / name"
+  type = string
 }
 
 variable "vpc_network" {
-  default = "terraform-vpc"
+  description = "Name of the VPC network of the cluster"
+  type = string
 }

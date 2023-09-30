@@ -1,5 +1,5 @@
 module "gce-vm" {
-  source = "./modules/gce"
+  source       = "./modules/gce"
   name         = "terraform-vm-1"
   gce_instance = "e2-micro"
   image_os     = "debian-cloud/debian-11"

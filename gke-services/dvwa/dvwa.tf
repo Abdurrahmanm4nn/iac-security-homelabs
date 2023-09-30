@@ -47,7 +47,6 @@ resource "kubernetes_deployment" "dvwa" {
 
 resource "google_compute_address" "default" {
   name   = var.vpc_network
-  region = var.region
   project = var.project
 }
 
