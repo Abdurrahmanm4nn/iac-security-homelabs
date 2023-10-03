@@ -45,9 +45,11 @@ resource "kubernetes_deployment" "dvwa" {
   }
 }
 
-resource "google_compute_address" "default" {
-  name   = var.vpc_network
+resource "google_compute_address" "web-endpoint" {
+  name   = var.address_name
   project = var.project
+  region = var.region
+  network_tier = var.network_tier
 }
 
 resource "kubernetes_service" "dvwa" {
@@ -69,6 +71,6 @@ resource "kubernetes_service" "dvwa" {
       name = "dvwa-entry"
     }
     type = "LoadBalancer"
-    load_balancer_ip = google_compute_address.default.address
+    load_balancer_ip = google_compute_address.web-endpoint.address
   }
 }

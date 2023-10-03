@@ -17,3 +17,13 @@ variable "network_tier" {
   description = "IP Network tier"
   type = string
 }
+
+variable "elastic_port" {
+  description = "Port to expose elastic"
+  type = number
+}
+
+variable "kibana_port" {
+  description = "Port to expose kibana"
+  type = number
+}
