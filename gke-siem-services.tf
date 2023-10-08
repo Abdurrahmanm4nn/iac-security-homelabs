@@ -10,21 +10,11 @@ provider "kubernetes" {
 module "elastic-siem" {
   source       = "./gke-services/elastic"
   address_name = "rmn-siem"
-  region       = var.region
+  region       = "us-west1"
   project      = var.project
   network_tier = "PREMIUM"
   elastic_port = 8080
-  kibana_port  = 80
-
-  providers = {
-    kubernetes = kubernetes.SIEM-Cluster
-  }
-}
-
-module "nginx-siem" {
-  source = "./gke-services/nginx"
-  service_name = module.elastic-siem.kibana_service
-  service_port = module.elastic-siem.kibana_port
+  kibana_port  = 8081
 
   providers = {
     kubernetes = kubernetes.SIEM-Cluster

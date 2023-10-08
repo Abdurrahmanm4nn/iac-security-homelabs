@@ -14,7 +14,7 @@ resource "kubernetes_deployment" "elasticsearch" {
   }
 
   spec {
-    replicas = 1
+    replicas = 2
     selector {
       match_labels = {
         app = "elasticsearch"
@@ -33,24 +33,36 @@ resource "kubernetes_deployment" "elasticsearch" {
           image = "docker.elastic.co/elasticsearch/elasticsearch:7.10.1"
           name  = "elasticsearch"
 
-          env {
-            name = "discovery.type"
-            value = "single-node"
-          }
-
           port {
             name = "elasticsearch"
             container_port = 9200
           }
+
+          readiness_probe {
+            http_get {
+              path = "/"
+              port = 9200
+            }
+            initial_delay_seconds = 300
+            period_seconds = 60
+            timeout_seconds = 60
+            success_threshold = 1
+            failure_threshold = 5
+          }
+
+          env {
+            name = "discovery.type"
+            value = "single-node"
+          }
           
           resources {
             limits  = {
-              cpu    = "2048m"
+              cpu    = "1536m"
               memory = "4096Mi"
             }
 
             requests = {
-              cpu    = "1024m"
+              cpu    = "512m"
               memory = "2048Mi"
             }
           }
@@ -88,6 +100,18 @@ resource "kubernetes_deployment" "kibana" {
           image = "docker.elastic.co/kibana/kibana:7.10.1"
           name  = "kibana"
 
+          readiness_probe {
+            http_get {
+              path = "/app/home"
+              port = 5601
+            }
+            initial_delay_seconds = 300
+            period_seconds = 60
+            timeout_seconds = 60
+            success_threshold = 1
+            failure_threshold = 5
+          }
+
           port {
             name = "kibana"
             container_port = 5601
@@ -95,18 +119,18 @@ resource "kubernetes_deployment" "kibana" {
 
           env {
             name = "ELASTICSEARCH_HOSTS"
-            value = kubernetes_service.elasticsearch.metadata[0].name
+            value = "http://${google_compute_address.siem-endpoint.address}:${var.elastic_port}"
           }
 
           resources {
             limits  = {
               cpu    = "2048m"
-              memory = "4096Mi"
+              memory = "8192Mi"
             }
 
             requests = {
               cpu    = "1024m"
-              memory = "2048Mi"
+              memory = "4096Mi"
             }
           }
         }
@@ -121,7 +145,7 @@ resource "kubernetes_service" "elasticsearch" {
   }
   spec {
     selector = {
-      app = kubernetes_deployment.elasticsearch.metadata[0].labels.app
+      app = "elasticsearch"
     }
     port {
       port        = var.elastic_port
@@ -139,7 +163,7 @@ resource "kubernetes_service" "kibana" {
   }
   spec {
     selector = {
-      app = kubernetes_deployment.kibana.metadata[0].labels.app
+      app = "kibana"
     }
     port {
       port        = var.kibana_port
